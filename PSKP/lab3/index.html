@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вычисление факториалов</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Вычисление факториалов</h1>
+        <div id="results" class="results"></div>
+        <div id="summary" class="summary"></div>
+    </div>
+    <script>
+        let startTime;
+        let completedRequests = 0;
+        const totalRequests = 20;
+        
+        function startRequests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            document.getElementById('summary').innerHTML = '';
+            
+            startTime = Date.now();
+            completedRequests = 0;
+            
+            for (let x = 1; x <= totalRequests; x++) {
+                fetch(`http://localhost:5000/fact?k=${x}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const currentTime = Date.now() - startTime;
+                        completedRequests++;
+                        
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'result-item';
+                        resultItem.textContent = `${currentTime}-${data.k}/${data.fact}`;
+                        resultsDiv.appendChild(resultItem);
+                        
+                        if (completedRequests === totalRequests) {
+                            const totalTime = Date.now() - startTime;
+                            document.getElementById('summary').textContent = 
+                                `Все запросы завершены. Общее время: ${totalTime}ms`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                        completedRequests++;
+                    });
+            }
+        }
+        
+        window.onload = startRequests;
+    </script>
+</body>
+</html>
