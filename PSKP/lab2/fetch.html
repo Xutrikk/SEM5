@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch API Пример</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Пример использования Fetch API</h1>
+        <p>Эта страница демонстрирует выполнение асинхронного GET-запроса к API сервера с использованием Fetch API.</p>
+        
+        <button onclick="loadData()">Загрузить данные с сервера</button>
+        
+        <div id="result">
+            <p>Результат запроса появится здесь после нажатия кнопки.</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadData() {
+            document.getElementById('result').innerHTML = '<p>Выполняется запрос к серверу...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/name');
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    
+                    document.getElementById('result').innerHTML = `
+                        <h3>Данные получены успешно:</h3>
+                        <p>Статус: ${response.status} ${response.statusText}</p>
+                        <p>Ответ сервера: <strong>${data}</strong></p>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h3>Произошла ошибка:</h3>
+                        <p>Статус: ${response.status} ${response.statusText}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <h3>Произошла ошибка сети</h3>
+                    <p>Проверьте, запущен ли сервер на localhost:5000</p>
+                    <p>Текст ошибки: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

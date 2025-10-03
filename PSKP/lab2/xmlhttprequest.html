@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XMLHttpRequest</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Пример использования XMLHttpRequest</h1>
+        <p>Эта страница демонстрирует выполнение асинхронного GET-запроса к API сервера.</p>
+        
+        <button onclick="loadData()">Загрузить данные с сервера</button>
+        
+        <div id="result">
+            <p>Результат запроса появится здесь после нажатия кнопки.</p>
+        </div>
+    </div>
+
+    <script>
+        function loadData() {
+            const xhr = new XMLHttpRequest();
+            
+            xhr.open('GET', 'http://localhost:5000/api/name', true);
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+
+                    document.getElementById('result').innerHTML = `
+                        <h3>Данные получены успешно:</h3>
+                        <p>Статус: ${xhr.status} ${xhr.statusText}</p>
+                        <p>Ответ сервера: <strong>${xhr.responseText}</strong></p>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h3>Произошла ошибка:</h3>
+                        <p>Статус: ${xhr.status} ${xhr.statusText}</p>
+                    `;
+                }
+            };
+            
+            xhr.onerror = function() {
+                document.getElementById('result').innerHTML = `
+                    <h3>Произошла ошибка сети</h3>
+                    <p>Проверьте, запущен ли сервер на localhost:5000</p>
+                `;
+            };
+            
+            xhr.send();
+            
+            document.getElementById('result').innerHTML = '<p>Выполняется запрос к серверу...</p>';
+        }
+
+    </script>
+</body>
+</html>

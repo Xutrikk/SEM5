@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery Ajax Пример</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Пример использования jQuery Ajax</h1>
+        <p>Эта страница демонстрирует выполнение асинхронного GET-запроса к API сервера с использованием jQuery.</p>
+        
+        <button id="loadDataBtn">Загрузить данные с сервера</button>
+        
+        <div id="result">
+            <p>Результат запроса появится здесь после нажатия кнопки.</p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#loadDataBtn').click(function() {
+                $('#result').html('<p>Выполняется запрос к серверу...</p>');
+                
+
+                $.ajax({
+                    url: 'http://localhost:5000/api/name',
+                    method: 'GET',
+                    dataType: 'text',
+                    success: function(data, textStatus, xhr) {
+                        $('#result').html(`
+                            <h3>Данные получены успешно:</h3>
+                            <p>Статус: ${xhr.status} ${xhr.statusText}</p>
+                            <p>Ответ сервера: <strong>${data}</strong></p>
+                        `);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        $('#result').html(`
+                            <h3>Произошла ошибка:</h3>
+                            <p>Статус: ${xhr.status} ${xhr.statusText}</p>
+                            <p>Текст ошибки: ${errorThrown}</p>
+                        `);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
