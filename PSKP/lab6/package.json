@@ -1,0 +1,21 @@
+{
+  "name": "m0603xutrikk",
+  "version": "1.0.0",
+  "description": "Модуль для отправки email через Yandex SMTP",
+  "main": "m06-03.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "email",
+    "nodemailer",
+    "yandex"
+  ],
+  "author": "xutrikk",
+  "license": "ISC",
+  "dependencies": {
+    "m0603xutrikk": "^1.0.0",
+    "nodemailer": "^7.0.6",
+    "sendmail": "^1.6.1"
+  }
+}
