@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление базой данных</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 5px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button.delete {
+            background-color: #f44336;
+        }
+        button.get {
+            background-color: #2196F3;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .result-item {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+            font-family: monospace;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Управление базой данных</h1>
+        
+        <div class="section">
+            <h2>Получить все записи (GET)</h2>
+            <button class="get" onclick="getAllRecords()">Получить все записи</button>
+            <div id="getResults" class="results"></div>
+            <div id="getStatus" class="status"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Добавить новую запись (POST)</h2>
+            <div class="form-group">
+                <label for="name">Имя:</label>
+                <input type="text" id="name" placeholder="Введите имя">
+            </div>
+            <div class="form-group">
+                <label for="bday">Дата рождения:</label>
+                <input type="date" id="bday">
+            </div>
+            <button onclick="addRecord()">Добавить запись</button>
+            <div id="postResults" class="results"></div>
+            <div id="postStatus" class="status"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Обновить запись (PUT)</h2>
+            <div class="form-group">
+                <label for="updateId">ID:</label>
+                <input type="text" id="updateId" placeholder="Введите ID" oninput="loadRecordData(this.value)">
+            </div>
+            <div class="form-group">
+                <label for="updateName">Имя:</label>
+                <input type="text" id="updateName" placeholder="Введите новое имя">
+            </div>
+            <div class="form-group">
+                <label for="updateBday">Дата рождения:</label>
+                <input type="date" id="updateBday">
+            </div>
+            <button onclick="updateRecord()">Обновить запись</button>
+            <div id="putResults" class="results"></div>
+            <div id="putStatus" class="status"></div>
+        </div>
+        
+        <div class="section">
+            <h2>Удалить запись (DELETE)</h2>
+            <div class="form-group">
+                <label for="deleteId">ID:</label>
+                <input type="text" id="deleteId" placeholder="Введите ID">
+            </div>
+            <button class="delete" onclick="deleteRecord()">Удалить запись</button>
+            <div id="deleteResults" class="results"></div>
+            <div id="deleteStatus" class="status"></div>
+        </div>
+    </div>
+
+    <script>
+        function showStatus(elementId, message, isSuccess) {
+            const statusElement = document.getElementById(elementId);
+            statusElement.textContent = message;
+            statusElement.className = isSuccess ? 'status success' : 'status error';
+            
+            setTimeout(() => {
+                statusElement.textContent = '';
+                statusElement.className = 'status';
+            }, 5000);
+        }
+        
+        function displayResults(elementId, data) {
+            const resultsElement = document.getElementById(elementId);
+            resultsElement.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        async function getAllRecords() {
+            try {
+                const response = await fetch('http://localhost:5000/api/db');
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                const data = await response.json();
+                displayResults('getResults', data);
+                showStatus('getStatus', 'Записи успешно получены', true);
+            } catch (error) {
+                showStatus('getStatus', `Ошибка: ${error.message}`, false);
+            }
+        }
+        
+        async function addRecord() {
+            const name = document.getElementById('name').value;
+            const bday = document.getElementById('bday').value;
+            
+            if (!name || !bday) {
+                showStatus('postStatus', 'Пожалуйста, заполните все поля', false);
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/db', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, bday })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayResults('postResults', data);
+                showStatus('postStatus', 'Запись успешно добавлена', true);
+                
+                document.getElementById('name').value = '';
+                document.getElementById('bday').value = '';
+            } catch (error) {
+                showStatus('postStatus', `Ошибка: ${error.message}`, false);
+            }
+        }
+        
+        async function loadRecordData(id) {
+            if (!id || isNaN(parseInt(id))) {
+                document.getElementById('updateName').value = '';
+                document.getElementById('updateBday').value = '';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/db');
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const allData = await response.json();
+                const record = allData.find(item => item.id === parseInt(id));
+                
+                if (record) {
+                    document.getElementById('updateName').value = record.name;
+                    document.getElementById('updateBday').value = record.bday;
+                    showStatus('putStatus', 'Запись найдена. Теперь можно редактировать.', true);
+                } else {
+                    document.getElementById('updateName').value = '';
+                    document.getElementById('updateBday').value = '';
+                    showStatus('putStatus', 'Запись с указанным ID не найдена', false);
+                }
+            } catch (error) {
+                showStatus('putStatus', `Ошибка: ${error.message}`, false);
+            }
+        }
+        
+        async function updateRecord() {
+            const id = document.getElementById('updateId').value;
+            const name = document.getElementById('updateName').value;
+            const bday = document.getElementById('updateBday').value;
+            
+            if (!id) {
+                showStatus('putStatus', 'Пожалуйста, укажите ID', false);
+                return;
+            }
+            
+            
+            try {
+                const updateData = {
+                    id: parseInt(id),
+                    name: name,
+                    bday: bday
+                };
+                
+                const response = await fetch('http://localhost:5000/api/db', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayResults('putResults', data);
+                showStatus('putStatus', 'Запись успешно обновлена', true);
+                
+                document.getElementById('updateId').value = '';
+                document.getElementById('updateName').value = '';
+                document.getElementById('updateBday').value = '';
+            } catch (error) {
+                showStatus('putStatus', `Ошибка: ${error.message}`, false);
+            }
+        }
+        
+        async function deleteRecord() {
+            const id = document.getElementById('deleteId').value;
+            
+            if (!id) {
+                showStatus('deleteStatus', 'Пожалуйста, укажите ID', false);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:5000/api/db?id=${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayResults('deleteResults', data);
+                showStatus('deleteStatus', 'Запись успешно удалена', true);
+                
+                document.getElementById('deleteId').value = '';
+            } catch (error) {
+                showStatus('deleteStatus', `Ошибка: ${error.message}`, false);
+            }
+        }
+        
+        window.onload = getAllRecords;
+    </script>
+</body>
+</html>
