@@ -1,0 +1,23 @@
+{
+    "cats": [
+      {
+        "name": "Whiskers",
+        "breed": "Siamese",
+        "age": 3,
+        "color": "Cream"
+      },
+      {
+        "name": "Tommy",
+        "breed": "Maine Coon",
+        "age": 5,
+        "color": "Gray"
+      },
+      {
+        "name": "Luna",
+        "breed": "Persian",
+        "age": 2,
+        "color": "White"
+      }
+    ]
+  }
+  
