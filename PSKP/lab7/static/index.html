@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static File Server</title>
+  <link rel="stylesheet" href="/styles/styles.css">
+</head>
+<body>
+<header>
+  <h1>Welcome to the Static File Server</h1>
+</header>
+
+<section>
+  <p>This page demonstrates serving static files:</p>
+  <ul>
+    <li><a href="documents/documents.docx">Download DOCX</a></li>
+    <li><img src="/images/cat.png" alt="Example PNG"></li>
+    <li>
+      <video controls>
+        <source src="/videos/video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>Data from JSON and XML</h2>
+  <div id="jsonData"></div>
+  <div id="xmlData"></div>
+</section>
+
+<script src="/scripts/scripts.js"></script>
+</body>
+</html>
