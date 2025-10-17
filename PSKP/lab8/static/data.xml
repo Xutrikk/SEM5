@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cats>
+    <cat>
+        <name>Whiskers</name>
+        <breed>Siamese</breed>
+        <age>3</age>
+        <color>Cream</color>
+    </cat>
+    <cat>
+        <name>Tommy</name>
+        <breed>Maine Coon</breed>
+        <age>5</age>
+        <color>Gray</color>
+    </cat>
+    <cat>
+        <name>Luna</name>
+        <breed>Persian</breed>
+        <age>2</age>
+        <color>White</color>
+    </cat>
+</cats>
