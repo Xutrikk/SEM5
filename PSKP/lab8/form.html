@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task 7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .row {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        .checks, .radios {
+            margin: 5px 0;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="/formparameter" method="POST">
+        <div class="row">
+            <label for="inputText">Type-Text</label>
+            <input type="text" id="inputText" name="inputText" required>
+        </div>
+
+        <div class="row">
+            <label for="inputNumber">Number</label>
+            <input type="number" id="inputNumber" name="inputNumber" required>
+        </div>
+
+        <div class="row">
+            <label for="inputDate">Date</label>
+            <input type="date" id="inputDate" name="inputDate" required>
+        </div>
+
+        <div class="row">
+            <label>Checkbox</label>
+            <input type="checkbox" value="inputCheck1" id="inputCheck1" name="inputCheck" class="checks">
+            <label for="inputCheck1">Check 1</label>
+            <input type="checkbox" value="inputCheck2" id="inputCheck2" name="inputCheck" class="checks">
+            <label for="inputCheck2">Check 2</label>
+        </div>
+
+        <div class="row">
+            <label>Radiobutton</label>
+            <input type="radio" value="inputRadio1" id="inputRadio1" name="inputRadio" class="radios">
+            <label for="inputRadio1">Radio 1</label>
+            <input type="radio" value="inputRadio2" id="inputRadio2" name="inputRadio" class="radios">
+            <label for="inputRadio2">Radio 2</label>
+        </div>
+
+        <div class="row">
+            <label for="inpTextArea">Textarea</label>
+            <textarea id="inputTextarea" name="inputTextArea" required></textarea>
+        </div>
+
+        <div class="row">
+            <input type="submit" name="inputSubmitForm" value="Send">
+        </div>
+    </form>
+</body>
+</html>
