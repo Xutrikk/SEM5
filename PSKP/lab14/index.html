@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление кафедрами</title>
+    <style>
+        :root {
+            --primary: #4a6fa5;
+            --success: #28a745;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 { margin: 0; font-size: 2em; }
+        .content { padding: 30px; }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+        }
+        button {
+            padding: 12px 24px;
+            margin: 8px 4px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: var(--danger); color: white; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        .section {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--primary);
+        }
+        .section h2 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        #error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        .pulpit-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+        }
+        .pulpit-code { font-weight: bold; color: var(--primary); font-size: 1.1em; }
+        .loading { color: var(--gray); font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Управление кафедрами</h1>
+        </header>
+
+        <div class="content">
+            <div id="error"></div>
+
+            <div class="section">
+                <h2>Список всех кафедр</h2>
+                <button class="btn-primary" onclick="loadPulpits()">Обновить список</button>
+                <div id="pulpits-list" style="margin-top: 20px;"></div>
+            </div>
+
+            <div class="section">
+                <h2>Добавить новую кафедру</h2>
+                <div class="form-group">
+                    <label>Код кафедры (PULPIT)</label>
+                    <input type="text" id="new-pulpit" placeholder="Например: ИСИТ">
+                </div>
+                <div class="form-group">
+                    <label>Название кафедры</label>
+                    <input type="text" id="new-name" placeholder="Информационных систем и технологий">
+                </div>
+                <div class="form-group">
+                    <label>Факультет (FACULTY)</label>
+                    <input type="text" id="new-faculty" placeholder="ИТ">
+                </div>
+                <button class="btn-success" onclick="addPulpit()">Добавить кафедру</button>
+            </div>
+
+            <div class="section">
+                <h2>Редактировать кафедру</h2>
+                <div class="form-group">
+                    <label>Код кафедры для редактирования</label>
+                    <input type="text" id="edit-code" placeholder="ИСИТ" oninput="loadPulpitForEdit()">
+                </div>
+                <div class="form-group">
+                    <label>Новое название</label>
+                    <input type="text" id="edit-name">
+                </div>
+                <div class="form-group">
+                    <label>Новый факультет</label>
+                    <input type="text" id="edit-faculty">
+                </div>
+                <button class="btn-warning" onclick="updatePulpit()">Обновить кафедру</button>
+            </div>
+
+            <div class="section">
+                <h2>Удалить кафедру</h2>
+                <div class="form-group">
+                    <label>Код кафедры для удаления</label>
+                    <input type="text" id="delete-code" placeholder="ИСИТ">
+                </div>
+                <button class="btn-danger" onclick="deletePulpit()">Удалить кафедру</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = '/api/pulpits';
+        const errorDiv = document.getElementById('error');
+
+        function showError(msg) {
+            errorDiv.textContent = 'Ошибка: ' + msg;
+            errorDiv.style.display = 'block';
+            setTimeout(() => errorDiv.style.display = 'none', 5000);
+        }
+
+        async function loadPulpits() {
+            try {
+                document.getElementById('pulpits-list').innerHTML = '<p class="loading">Загрузка...</p>';
+                const res = await fetch(API);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                
+                const list = document.getElementById('pulpits-list');
+                if (data.length === 0) {
+                    list.innerHTML = '<p>Кафедры не найдены</p>';
+                    return;
+                }
+                list.innerHTML = data.map(p => `
+                    <div class="pulpit-item">
+                        <div class="pulpit-code">${p.PULPIT.trim()}</div>
+                        <div><strong>${p.PULPIT_NAME.trim()}</strong></div>
+                        <div>Факультет: <em>${p.FACULTY.trim()}</em></div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function addPulpit() {
+            const code = document.getElementById('new-pulpit').value.trim();
+            const name = document.getElementById('new-name').value.trim();
+            const faculty = document.getElementById('new-faculty').value.trim();
+
+            if (!code || !name || !faculty) return showError('Заполните все поля');
+
+            try {
+                const res = await fetch(API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ PULPIT: code, PULPIT_NAME: name, FACULTY: faculty })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || data.message || 'Ошибка добавления');
+                
+                document.getElementById('new-pulpit').value = '';
+                document.getElementById('new-name').value = '';
+                document.getElementById('new-faculty').value = '';
+                loadPulpits();
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function loadPulpitForEdit() {
+            const code = document.getElementById('edit-code').value.trim();
+            if (!code) {
+                document.getElementById('edit-name').value = '';
+                document.getElementById('edit-faculty').value = '';
+                return;
+            }
+
+            try {
+                const res = await fetch(API);
+                const data = await res.json();
+                const pulpit = data.find(p => p.PULPIT.trim() === code);
+                
+                if (pulpit) {
+                    document.getElementById('edit-name').value = pulpit.PULPIT_NAME.trim();
+                    document.getElementById('edit-faculty').value = pulpit.FACULTY.trim();
+                } else {
+                    showError('Кафедра не найдена');
+                }
+            } catch (err) {
+                showError('Ошибка загрузки');
+            }
+        }
+
+        async function updatePulpit() {
+            const code = document.getElementById('edit-code').value.trim();
+            const name = document.getElementById('edit-name').value.trim();
+            const faculty = document.getElementById('edit-faculty').value.trim();
+
+            if (!code || !name || !faculty) return showError('Заполните все поля');
+
+            try {
+                const res = await fetch(API, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ PULPIT: code, PULPIT_NAME: name, FACULTY: faculty })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Ошибка обновления');
+                
+                loadPulpits();
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+
+        async function deletePulpit() {
+            const code = document.getElementById('delete-code').value.trim();
+            if (!code) return showError('Введите код кафедры');
+
+            if (!confirm(`Удалить кафедру ${code}?`)) return;
+
+            try {
+                const res = await fetch(`${API}/${code}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Ошибка удаления');
+                
+                document.getElementById('delete-code').value = '';
+                loadPulpits();
+            } catch (err) {
+                showError(err.message);
+            }
+        }
+        loadPulpits();
+    </script>
+</body>
+</html>
