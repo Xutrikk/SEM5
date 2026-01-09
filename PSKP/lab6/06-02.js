@@ -11,7 +11,7 @@ const emailConfig = {
     secure: true,
     auth: {
         user: 'khutartsou@yandex.ru',
-        pass: 'uludyejwjbkgklmm'
+        pass: 'dasdasawfasfs'
     }
 };
 
@@ -75,4 +75,5 @@ http.createServer((req, resp) => {
     } else {
         resp.end('<h1>Not supported</h1>');
     }
+
 }).listen(3000, () => console.log('Server running at http://localhost:3000/'));
