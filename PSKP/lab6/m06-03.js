@@ -9,7 +9,7 @@
         secure: true, 
         auth: {
             user: 'khutartsou@yandex.ru', 
-            pass: 'uludyejwjbkgklmm' 
+            pass: 'fsdfsdafsdafsdafsadf' 
         }
     });
 
@@ -44,3 +44,4 @@
     }
 
     module.exports = { send };
+
